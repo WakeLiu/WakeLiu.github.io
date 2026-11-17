@@ -16,8 +16,8 @@
   --border-strong: hsla(40, 20%, 90%, 0.18);
   --shadow-soft: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
 
-  --font-serif: 'Noto Serif TC', 'Songti TC', Georgia, serif;
-  --font-sans: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Iansui', 'LXGW WenKai TC', 'FangSong', 'STFangsong', serif;
+  --font-sans: 'Iansui', 'LXGW WenKai TC', 'FangSong', 'STFangsong', -apple-system, BlinkMacSystemFont, serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   --max-width-reading: 740px;
@@ -324,38 +324,12 @@ a {
   line-height: 1.7;
 }
 
-/* Cross-Platform Sync Bar (Medium & vocus helper) */
-.sync-toolbar {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 0.85rem 1.15rem;
-  margin-bottom: 2.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.sync-toolbar-label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.sync-toolbar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
 /* Article Typography & Human-AI Dialogue Components */
 .article-body {
-  font-size: 1.08rem;
-  line-height: 1.9;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 2.05;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
 }
 
