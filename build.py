@@ -119,6 +119,10 @@ def render_markdown(md_body: str, author_name: str):
       portable_parts.append(rendered_before)
 
     role = match.group(1).lower()
+    if role == 'html':
+      site_parts.append(match.group(2))
+      pos = match.end()
+      continue
     content_html = render_paragraphs(match.group(2))
     if role == 'human':
       label = f'{html.escape(author_name)} 提問・思辨'
@@ -240,7 +244,7 @@ def build_site():
     meta, body = parse_frontmatter(raw)
     title = meta.get('title', slug)
     date = meta.get('date', '')
-    category = meta.get('category', '哲學思辨')
+    category = meta.get('category', '生命科學')
     categories = [c.strip() for c in category.split(',') if c.strip()]
     tags = [t.strip() for t in meta.get('tags', '').split(',') if t.strip()]
     summary = meta.get('summary', '')
@@ -362,7 +366,7 @@ def build_site():
 <body>
   {header_nav(site_cfg, "index.html", is_home=True)}
   <section class="hero-section">
-    <span class="hero-eyebrow">COSMOS · ARTIFICIAL INTELLIGENCE · PHILOSOPHY</span>
+    <span class="hero-eyebrow">COSMOS · ARTIFICIAL INTELLIGENCE · LIFE SCIENCES</span>
     <h1 class="hero-title">{html.escape(site_cfg['title'])}{hero_en}</h1>
     <p class="hero-subtitle">{html.escape(site_cfg['subtitle'])}</p>
   </section>
