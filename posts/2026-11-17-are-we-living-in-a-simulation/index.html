@@ -42,6 +42,8 @@
           <time datetime="2026-11-17">2026-11-17</time>
           <span>·</span>
           <span>作者：Wake Liu</span>
+          <span>·</span>
+          <span>觀看人次：<span id="article-view-count">—</span></span>
         </div>
         <h1 class="article-title">我們活在虛擬世界裡嗎？</h1>
         <p class="article-subtitle">人類歷史也不過五千年，AI 就已經發展至此。如果五千年後我們有能力模擬宇宙，那麼現在的我們，會不會其實也活在虛擬世界裡？</p>
@@ -90,5 +92,23 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <script>
+    (async function() {
+      const el = document.getElementById('article-view-count');
+      if (!el) return;
+      try {
+        const res = await fetch('https://events.vercount.one/api/v2/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: 'https://wakeliu.github.io/posts/2026-11-17-are-we-living-in-a-simulation/' })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const pv = json?.data?.page_pv ?? json?.page_pv;
+          if (pv !== undefined) el.textContent = Number(pv).toLocaleString();
+        }
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>

@@ -43,6 +43,8 @@
         <span class="post-category">宇宙論</span><span>·</span><span class="post-category">AI 意識</span>
         <span>·</span>
         <time datetime="2026-11-17">2026-11-17</time>
+        <span>·</span>
+        <span>觀看人次：<span class="card-view-count" data-post-url="https://wakeliu.github.io/posts/2026-11-17-prologue/">—</span></span>
       </div>
       <a href="posts/2026-11-17-prologue/index.html" id="post-link-2026-11-17-prologue">
         <div class="post-card-cover"><img src="assets/images/2026-11-17-prologue.jpg" alt="楔子" class="post-card-img" loading="lazy"></div>
@@ -55,6 +57,8 @@
         <span class="post-category">生命科學</span>
         <span>·</span>
         <time datetime="2026-11-17">2026-11-17</time>
+        <span>·</span>
+        <span>觀看人次：<span class="card-view-count" data-post-url="https://wakeliu.github.io/posts/2026-11-17-live-to-1000-years/">—</span></span>
       </div>
       <a href="posts/2026-11-17-live-to-1000-years/index.html" id="post-link-2026-11-17-live-to-1000-years">
         <div class="post-card-cover"><img src="assets/images/2026-11-17-live-to-1000-years.jpg" alt="我們這一代人，可能活到 1000 歲" class="post-card-img" loading="lazy"></div>
@@ -67,6 +71,8 @@
         <span class="post-category">宇宙論</span>
         <span>·</span>
         <time datetime="2026-11-17">2026-11-17</time>
+        <span>·</span>
+        <span>觀看人次：<span class="card-view-count" data-post-url="https://wakeliu.github.io/posts/2026-11-17-are-we-living-in-a-simulation/">—</span></span>
       </div>
       <a href="posts/2026-11-17-are-we-living-in-a-simulation/index.html" id="post-link-2026-11-17-are-we-living-in-a-simulation">
         <div class="post-card-cover"><img src="assets/images/2026-11-17-are-we-living-in-a-simulation.jpg" alt="我們活在虛擬世界裡嗎？" class="post-card-img" loading="lazy"></div>
@@ -123,6 +129,19 @@
     if (searchInput) {
       searchInput.addEventListener('input', filterPosts);
     }
+
+    document.querySelectorAll('.card-view-count').forEach(async (el) => {
+      const targetUrl = el.dataset.postUrl;
+      if (!targetUrl) return;
+      try {
+        const res = await fetch('https://events.vercount.one/api/v2/log?url=' + encodeURIComponent(targetUrl));
+        if (res.ok) {
+          const json = await res.json();
+          const pv = json?.data?.page_pv ?? json?.page_pv;
+          if (pv !== undefined) el.textContent = Number(pv).toLocaleString();
+        }
+      } catch (e) {}
+    });
   </script>
 </body>
 </html>

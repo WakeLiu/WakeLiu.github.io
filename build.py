@@ -298,6 +298,8 @@ def build_site():
           <time datetime="{html.escape(date)}">{html.escape(date)}</time>
           <span>·</span>
           <span>作者：{html.escape(site_cfg['author'])}</span>
+          <span>·</span>
+          <span>觀看人次：<span id="article-view-count">—</span></span>
         </div>
         <h1 class="article-title">{html.escape(title)}</h1>
         <p class="article-subtitle">{html.escape(summary)}</p>
@@ -317,6 +319,24 @@ def build_site():
     <p>© {html.escape(site_cfg['author'])} · {html.escape(site_cfg['title'])} · Hosted on GitHub Pages</p>
   </footer>
   {theme_script()}
+  <script>
+    (async function() {{
+      const el = document.getElementById('article-view-count');
+      if (!el) return;
+      try {{
+        const res = await fetch('https://events.vercount.one/api/v2/log', {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{ url: '{html.escape(post_url)}' }})
+        }});
+        if (res.ok) {{
+          const json = await res.json();
+          const pv = json?.data?.page_pv ?? json?.page_pv;
+          if (pv !== undefined) el.textContent = Number(pv).toLocaleString();
+        }}
+      }} catch (e) {{}}
+    }})();
+  </script>
 </body>
 </html>"""
     (out_dir / 'index.html').write_text(article_page, encoding='utf-8')
@@ -348,6 +368,8 @@ def build_site():
         {card_cats_html}
         <span>·</span>
         <time datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
+        <span>·</span>
+        <span>觀看人次：<span class="card-view-count" data-post-url="{html.escape(p['url'])}">—</span></span>
       </div>
       <a href="posts/{p['slug']}/index.html" id="post-link-{p['slug']}">
         {cover_html}
@@ -415,6 +437,19 @@ def build_site():
     if (searchInput) {{
       searchInput.addEventListener('input', filterPosts);
     }}
+
+    document.querySelectorAll('.card-view-count').forEach(async (el) => {{
+      const targetUrl = el.dataset.postUrl;
+      if (!targetUrl) return;
+      try {{
+        const res = await fetch('https://events.vercount.one/api/v2/log?url=' + encodeURIComponent(targetUrl));
+        if (res.ok) {{
+          const json = await res.json();
+          const pv = json?.data?.page_pv ?? json?.page_pv;
+          if (pv !== undefined) el.textContent = Number(pv).toLocaleString();
+        }}
+      }} catch (e) {{}}
+    }});
   </script>
 </body>
 </html>"""

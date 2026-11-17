@@ -42,6 +42,8 @@
           <time datetime="2026-11-17">2026-11-17</time>
           <span>·</span>
           <span>作者：Wake Liu</span>
+          <span>·</span>
+          <span>觀看人次：<span id="article-view-count">—</span></span>
         </div>
         <h1 class="article-title">我們這一代人，可能活到 1000 歲</h1>
         <p class="article-subtitle">我們不需要在今天就發明長生不老藥。只要活到醫療進步快過衰老速度的「奇點谷底」，今天活在地球上的許多人，或許正是人類史上第一批有機會跨過千年門檻的世代。</p>
@@ -276,5 +278,23 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <script>
+    (async function() {
+      const el = document.getElementById('article-view-count');
+      if (!el) return;
+      try {
+        const res = await fetch('https://events.vercount.one/api/v2/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: 'https://wakeliu.github.io/posts/2026-11-17-live-to-1000-years/' })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          const pv = json?.data?.page_pv ?? json?.page_pv;
+          if (pv !== undefined) el.textContent = Number(pv).toLocaleString();
+        }
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>
