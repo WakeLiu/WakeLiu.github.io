@@ -154,10 +154,21 @@ def render_markdown(md_body: str, author_name: str):
   return '\n'.join(site_parts), '\n'.join(portable_parts)
 
 
-def head_html(title: str, description: str, css_path: str, canonical_url: str = '') -> str:
+def head_html(
+    title: str,
+    description: str,
+    css_path: str,
+    canonical_url: str = '',
+    og_image: str = '',
+) -> str:
   canon_tag = (
       f'<link rel="canonical" href="{html.escape(canonical_url)}">'
       if canonical_url
+      else ''
+  )
+  og_img_tag = (
+      f'<meta property="og:image" content="{html.escape(og_image)}">'
+      if og_image
       else ''
   )
   return f"""<!DOCTYPE html>
@@ -170,6 +181,7 @@ def head_html(title: str, description: str, css_path: str, canonical_url: str = 
   <meta property="og:title" content="{html.escape(title)}">
   <meta property="og:description" content="{html.escape(description)}">
   <meta property="og:type" content="article">
+  {og_img_tag}
   {canon_tag}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -232,9 +244,13 @@ def build_site():
     category = meta.get('category', '哲學思辨')
     tags = [t.strip() for t in meta.get('tags', '').split(',') if t.strip()]
     summary = meta.get('summary', '')
+    image = meta.get('image', '').strip().lstrip('/')
 
     site_html, portable_html = render_markdown(body, site_cfg['author'])
     post_url = f"{site_cfg['base_url'].rstrip('/')}/posts/{slug}/"
+    og_image_url = (
+        f"{site_cfg['base_url'].rstrip('/')}/{image}" if image else ''
+    )
 
     post_data = {
         'slug': slug,
@@ -243,6 +259,7 @@ def build_site():
         'category': category,
         'tags': tags,
         'summary': summary,
+        'image': image,
         'site_html': site_html,
         'portable_html': portable_html,
         'url': post_url,
@@ -253,8 +270,15 @@ def build_site():
     out_dir = posts_dir / slug
     out_dir.mkdir(parents=True, exist_ok=True)
     tags_html = ''.join(f'<span class="tag-badge">#{html.escape(t)}</span>' for t in tags)
+    hero_img_html = (
+        f'<figure class="article-hero-figure">'
+        f'<img src="../../{html.escape(image)}" alt="{html.escape(title)}" class="article-hero-img" loading="eager">'
+        f'</figure>'
+        if image
+        else ''
+    )
 
-    article_page = f"""{head_html(f"{title} | {site_cfg['title']}", summary, "../../assets/index.css", post_url)}
+    article_page = f"""{head_html(f"{title} | {site_cfg['title']}", summary, "../../assets/index.css", post_url, og_image_url)}
 <body>
   {header_nav(site_cfg, "../../index.html")}
   <main class="main-container">
@@ -270,7 +294,7 @@ def build_site():
         <h1 class="article-title">{html.escape(title)}</h1>
         <p class="article-subtitle">{html.escape(summary)}</p>
       </header>
-
+      {hero_img_html}
       <div class="article-body" id="article-content">
         {site_html}
       </div>
@@ -300,13 +324,21 @@ def build_site():
   cards_html = []
   for p in posts:
     tags_badges = ''.join(f'<span class="tag-badge">#{html.escape(t)}</span>' for t in p['tags'])
-    cards_html.append(f"""<article class="post-card" data-category="{html.escape(p['category'])}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
+    cover_html = (
+        f'<div class="post-card-cover">'
+        f'<img src="{html.escape(p["image"])}" alt="{html.escape(p["title"])}" class="post-card-img" loading="lazy">'
+        f'</div>'
+        if p.get('image')
+        else ''
+    )
+    cards_html.append(f"""<article class="post-card" data-category="{html.escape(p['category'])}" data-tags="{html.escape(','.join(p['tags']))}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
       <div class="post-meta">
         <span class="post-category">{html.escape(p['category'])}</span>
         <span>·</span>
         <time datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
       </div>
       <a href="posts/{p['slug']}/index.html" id="post-link-{p['slug']}">
+        {cover_html}
         <h2 class="post-card-title">{html.escape(p['title'])}</h2>
         <p class="post-summary">{html.escape(p['summary'])}</p>
       </a>
@@ -346,7 +378,8 @@ def build_site():
     function filterPosts() {{
       const q = (searchInput.value || '').trim().toLowerCase();
       cards.forEach(card => {{
-        const catMatch = activeCat === '全部' || card.dataset.category === activeCat;
+        const tags = (card.dataset.tags || '').split(',');
+        const catMatch = activeCat === '全部' || card.dataset.category === activeCat || tags.includes(activeCat);
         const searchMatch = !q || card.dataset.search.includes(q);
         card.style.display = (catMatch && searchMatch) ? '' : 'none';
       }});
