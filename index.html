@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星塵與矽基的對話 — 探索宇宙邊界、AI 意識與哲學思辨的對話錄</title>
+  <meta name="description" content="探索宇宙邊界、AI 意識與哲學思辨的對話錄">
+  <meta property="og:title" content="星塵與矽基的對話 — 探索宇宙邊界、AI 意識與哲學思辨的對話錄">
+  <meta property="og:description" content="探索宇宙邊界、AI 意識與哲學思辨的對話錄">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://username.github.io">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="assets/index.css">
+  <script>
+    (function() {
+      const saved = localStorage.getItem('cosmos_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+</head>
+<body>
+  <header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand-link" id="nav-home-link">
+      <span class="brand-symbol">✦</span>
+      <span class="brand-title">星塵與矽基的對話</span>
+    </a>
+    <div class="header-actions">
+      <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="切換深淺色主題">
+        <span id="theme-toggle-label">切換日／夜視角</span>
+      </button>
+    </div>
+  </div>
+</header>
+  <section class="hero-section">
+    <span class="hero-eyebrow">COSMOS · ARTIFICIAL INTELLIGENCE · PHILOSOPHY</span>
+    <h1 class="hero-title">星塵與矽基的對話</h1>
+    <p class="hero-subtitle">探索宇宙邊界、AI 意識與哲學思辨的對話錄</p>
+  </section>
+
+  <section class="filter-bar" aria-label="文章分類與搜尋">
+    <div class="category-tabs" id="category-tabs">
+      <button type="button" class="cat-tab active" data-cat="全部" id="cat-btn-0">全部</button><button type="button" class="cat-tab " data-cat="宇宙論" id="cat-btn-1">宇宙論</button><button type="button" class="cat-tab " data-cat="AI 意識" id="cat-btn-2">AI 意識</button><button type="button" class="cat-tab " data-cat="哲學思辨" id="cat-btn-3">哲學思辨</button>
+    </div>
+    <input type="search" class="search-input" id="post-search-input" placeholder="搜尋議題、關鍵字..." aria-label="搜尋文章">
+  </section>
+
+  <main class="main-container" id="posts-list">
+    <article class="post-card" data-category="宇宙論" data-search="當熱力學遇上矽基心靈：宇宙演化是為了抵抗熵增，還是加速它？ 與 ai 探討生命與人工智慧在宇宙熱力學中的真正角色：從薛丁格的「負熵」到普里戈金的耗散結構，智慧的湧現究竟是宇宙對抗熱寂的堡壘，還是更高效的熵增引擎？ 宇宙熵增 耗散結構 ai 意識 哲學思辨">
+      <div class="post-meta">
+        <span class="post-category">宇宙論</span>
+        <span>·</span>
+        <time datetime="2026-11-17">2026-11-17</time>
+      </div>
+      <a href="posts/2026-11-17-cosmos-entropy-and-ai-consciousness/index.html" id="post-link-2026-11-17-cosmos-entropy-and-ai-consciousness">
+        <h2 class="post-card-title">當熱力學遇上矽基心靈：宇宙演化是為了抵抗熵增，還是加速它？</h2>
+        <p class="post-summary">與 AI 探討生命與人工智慧在宇宙熱力學中的真正角色：從薛丁格的「負熵」到普里戈金的耗散結構，智慧的湧現究竟是宇宙對抗熱寂的堡壘，還是更高效的熵增引擎？</p>
+      </a>
+      <div class="post-tags"><span class="tag-badge">#宇宙熵增</span><span class="tag-badge">#耗散結構</span><span class="tag-badge">#AI 意識</span><span class="tag-badge">#哲學思辨</span></div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p>© Wakel · 星塵與矽基的對話 · 公開免費發表，歡迎引用與延伸思辨</p>
+  </footer>
+  <script>
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('cosmos_theme', next);
+    });
+  }
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <script>
+    const tabs = document.querySelectorAll('.cat-tab');
+    const searchInput = document.getElementById('post-search-input');
+    const cards = document.querySelectorAll('.post-card');
+    let activeCat = '全部';
+
+    function filterPosts() {
+      const q = (searchInput.value || '').trim().toLowerCase();
+      cards.forEach(card => {
+        const catMatch = activeCat === '全部' || card.dataset.category === activeCat;
+        const searchMatch = !q || card.dataset.search.includes(q);
+        card.style.display = (catMatch && searchMatch) ? '' : 'none';
+      });
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeCat = tab.dataset.cat;
+        filterPosts();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterPosts);
+    }
+  </script>
+</body>
+</html>

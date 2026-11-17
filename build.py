@@ -1,0 +1,420 @@
+#!/usr/bin/env python3
+"""Static site generator for the Cosmos, AI & Philosophy dialogue blog."""
+
+import html
+import json
+import os
+from pathlib import Path
+import re
+
+ROOT = Path(__file__).parent.resolve()
+
+
+def parse_frontmatter(text: str):
+  meta = {}
+  body = text
+  if text.startswith('---\n'):
+    parts = text.split('\n---\n', 1)
+    if len(parts) == 2:
+      raw_meta, body = parts[0][4:], parts[1]
+      for line in raw_meta.splitlines():
+        if ':' in line:
+          k, v = line.split(':', 1)
+          meta[k.strip()] = v.strip()
+  return meta, body.strip()
+
+
+def format_inline(text: str) -> str:
+  # Protect inline math $...$
+  math_tokens = []
+
+  def save_math(m):
+    math_tokens.append(m.group(0))
+    return f'@@MATH_{len(math_tokens)-1}@@'
+
+  text = re.sub(r'\$\$[\s\S]+?\$\$|\$[^$\n]+?\$', save_math, text)
+  # Bold, italic, inline code, links
+  text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
+  text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
+  text = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', text)
+  text = re.sub(
+      r'\[([^\]]+)\]\(([^)]+)\)',
+      r'<a href="\2" target="_blank" rel="noopener">\1</a>',
+      text,
+  )
+
+  for idx, token in enumerate(math_tokens):
+    text = text.replace(f'@@MATH_{idx}@@', token)
+  return text
+
+
+def render_paragraphs(chunk: str) -> str:
+  lines = chunk.strip().splitlines()
+  out = []
+  buf = []
+  in_list = False
+
+  def flush_buf():
+    if buf:
+      joined = ' '.join(buf).strip()
+      if joined.startswith('$$') and joined.endswith('$$'):
+        out.append(f'<div class="math-block">{joined}</div>')
+      else:
+        out.append(f'<p>{format_inline(joined)}</p>')
+      buf.clear()
+
+  for line in lines:
+    stripped = line.strip()
+    if not stripped:
+      if in_list:
+        out.append('</ul>')
+        in_list = False
+      flush_buf()
+      continue
+    if stripped.startswith('## '):
+      if in_list:
+        out.append('</ul>')
+        in_list = False
+      flush_buf()
+      out.append(f'<h2>{format_inline(stripped[3:])}</h2>')
+    elif stripped.startswith('### '):
+      if in_list:
+        out.append('</ul>')
+        in_list = False
+      flush_buf()
+      out.append(f'<h3>{format_inline(stripped[4:])}</h3>')
+    elif stripped.startswith('- ') or stripped.startswith('* '):
+      flush_buf()
+      if not in_list:
+        out.append('<ul>')
+        in_list = True
+      out.append(f'<li>{format_inline(stripped[2:])}</li>')
+    elif stripped.startswith('> '):
+      if in_list:
+        out.append('</ul>')
+        in_list = False
+      flush_buf()
+      out.append(f'<blockquote><p>{format_inline(stripped[2:])}</p></blockquote>')
+    else:
+      buf.append(stripped)
+
+  if in_list:
+    out.append('</ul>')
+  flush_buf()
+  return '\n'.join(out)
+
+
+def render_markdown(md_body: str, author_name: str):
+  """Returns (site_html, portable_html_for_vocus_medium)."""
+  pattern = re.compile(r':::(\w+)\n([\s\S]*?)\n:::', re.MULTILINE)
+  pos = 0
+  site_parts = []
+  portable_parts = []
+
+  for match in pattern.finditer(md_body):
+    before = md_body[pos : match.start()]
+    if before.strip():
+      rendered_before = render_paragraphs(before)
+      site_parts.append(rendered_before)
+      portable_parts.append(rendered_before)
+
+    role = match.group(1).lower()
+    content_html = render_paragraphs(match.group(2))
+    if role == 'human':
+      label = f'{html.escape(author_name)} 提問・思辨'
+      site_parts.append(
+          f'<section class="dialogue-turn dialogue-human">'
+          f'<div class="speaker-label">✦ {label}</div>'
+          f'<div class="dialogue-content">{content_html}</div>'
+          f'</section>'
+      )
+      portable_parts.append(
+          f'<blockquote><p><strong>🙋‍♂️ {html.escape(author_name)} 提問：</strong></p>'
+          f'{content_html}</blockquote>'
+      )
+    else:
+      label = 'AI 回應・推演'
+      site_parts.append(
+          f'<section class="dialogue-turn dialogue-ai">'
+          f'<div class="speaker-label">◈ {label}</div>'
+          f'<div class="dialogue-content">{content_html}</div>'
+          f'</section>'
+      )
+      portable_parts.append(
+          f'<blockquote><p><strong>🤖 AI 回應：</strong></p>{content_html}</blockquote>'
+      )
+    pos = match.end()
+
+  tail = md_body[pos:]
+  if tail.strip():
+    rendered_tail = render_paragraphs(tail)
+    site_parts.append(rendered_tail)
+    portable_parts.append(rendered_tail)
+
+  return '\n'.join(site_parts), '\n'.join(portable_parts)
+
+
+def head_html(title: str, description: str, css_path: str, canonical_url: str = '') -> str:
+  canon_tag = (
+      f'<link rel="canonical" href="{html.escape(canonical_url)}">'
+      if canonical_url
+      else ''
+  )
+  return f"""<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{html.escape(title)}</title>
+  <meta name="description" content="{html.escape(description)}">
+  <meta property="og:title" content="{html.escape(title)}">
+  <meta property="og:description" content="{html.escape(description)}">
+  <meta property="og:type" content="article">
+  {canon_tag}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="{css_path}">
+  <script>
+    (function() {{
+      const saved = localStorage.getItem('cosmos_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    }})();
+  </script>
+</head>"""
+
+
+def header_nav(site_cfg: dict, home_href: str) -> str:
+  return f"""<header class="site-header">
+  <div class="header-inner">
+    <a href="{home_href}" class="brand-link" id="nav-home-link">
+      <span class="brand-symbol">✦</span>
+      <span class="brand-title">{html.escape(site_cfg['title'])}</span>
+    </a>
+    <div class="header-actions">
+      <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="切換深淺色主題">
+        <span id="theme-toggle-label">切換日／夜視角</span>
+      </button>
+    </div>
+  </div>
+</header>"""
+
+
+def theme_script() -> str:
+  return """<script>
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('cosmos_theme', next);
+    });
+  }
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>"""
+
+
+def build_site():
+  site_cfg = json.loads((ROOT / 'site.json').read_text(encoding='utf-8'))
+  posts_dir = ROOT / 'posts'
+  posts = []
+
+  for md_file in sorted(posts_dir.glob('*.md'), reverse=True):
+    slug = md_file.stem
+    raw = md_file.read_text(encoding='utf-8')
+    meta, body = parse_frontmatter(raw)
+    title = meta.get('title', slug)
+    date = meta.get('date', '')
+    category = meta.get('category', '哲學思辨')
+    tags = [t.strip() for t in meta.get('tags', '').split(',') if t.strip()]
+    summary = meta.get('summary', '')
+
+    site_html, portable_html = render_markdown(body, site_cfg['author'])
+    post_url = f"{site_cfg['base_url'].rstrip('/')}/posts/{slug}/"
+
+    post_data = {
+        'slug': slug,
+        'title': title,
+        'date': date,
+        'category': category,
+        'tags': tags,
+        'summary': summary,
+        'site_html': site_html,
+        'portable_html': portable_html,
+        'url': post_url,
+    }
+    posts.append(post_data)
+
+    # Write individual post page: posts/<slug>/index.html
+    out_dir = posts_dir / slug
+    out_dir.mkdir(parents=True, exist_ok=True)
+    tags_html = ''.join(f'<span class="tag-badge">#{html.escape(t)}</span>' for t in tags)
+
+    article_page = f"""{head_html(f"{title} | {site_cfg['title']}", summary, "../../assets/index.css", post_url)}
+<body>
+  {header_nav(site_cfg, "../../index.html")}
+  <main class="main-container">
+    <article>
+      <header class="article-header">
+        <div class="post-meta">
+          <span class="post-category">{html.escape(category)}</span>
+          <span>·</span>
+          <time datetime="{html.escape(date)}">{html.escape(date)}</time>
+          <span>·</span>
+          <span>作者：{html.escape(site_cfg['author'])} × AI</span>
+        </div>
+        <h1 class="article-title">{html.escape(title)}</h1>
+        <p class="article-subtitle">{html.escape(summary)}</p>
+      </header>
+
+      <aside class="sync-toolbar" aria-label="跨平台同步工具">
+        <div class="sync-toolbar-label">
+          <span>⇄ 跨平台發表工具：一鍵複製排好版的內容貼至「方格子 vocus」或「Medium」</span>
+        </div>
+        <div class="sync-toolbar-actions">
+          <button type="button" class="icon-btn" id="copy-rich-btn">複製方格子 / Medium 排版內文</button>
+          <button type="button" class="icon-btn" id="copy-url-btn">複製本文標準網址 (Canonical URL)</button>
+        </div>
+      </aside>
+
+      <div class="article-body" id="article-content">
+        {site_html}
+      </div>
+
+      <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div class="post-tags">{tags_html}</div>
+        <a href="../../index.html" class="icon-btn" id="back-to-home-btn">← 返回所有思辨文章</a>
+      </footer>
+    </article>
+
+    <div id="portable-copy-source" style="position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;">
+      <h1>{html.escape(title)}</h1>
+      <p><em>{html.escape(summary)}</em></p>
+      <hr>
+      {portable_html}
+      <hr>
+      <p><em>本文首發於 <a href="{html.escape(post_url)}">{html.escape(site_cfg['title'])}</a>，歡迎留言交流宇宙、AI 與哲學思辨。</em></p>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <p>© {html.escape(site_cfg['author'])} · {html.escape(site_cfg['title'])} · Hosted on GitHub Pages</p>
+  </footer>
+  {theme_script()}
+  <script>
+    const copyRichBtn = document.getElementById('copy-rich-btn');
+    if (copyRichBtn) {{
+      copyRichBtn.addEventListener('click', async () => {{
+        const src = document.getElementById('portable-copy-source');
+        try {{
+          const blobHtml = new Blob([src.innerHTML], {{ type: 'text/html' }});
+          const blobText = new Blob([src.innerText], {{ type: 'text/plain' }});
+          await navigator.clipboard.write([new ClipboardItem({{ 'text/html': blobHtml, 'text/plain': blobText }})]);
+          copyRichBtn.textContent = '✓ 已複製！可直接貼上至方格子或 Medium';
+          setTimeout(() => {{ copyRichBtn.textContent = '複製方格子 / Medium 排版內文'; }}, 3000);
+        }} catch (e) {{
+          await navigator.clipboard.writeText(src.innerText);
+          copyRichBtn.textContent = '✓ 已複製純文字格式';
+        }}
+      }});
+    }}
+    const copyUrlBtn = document.getElementById('copy-url-btn');
+    if (copyUrlBtn) {{
+      copyUrlBtn.addEventListener('click', async () => {{
+        await navigator.clipboard.writeText(window.location.href);
+        copyUrlBtn.textContent = '✓ 已複製網址';
+        setTimeout(() => {{ copyUrlBtn.textContent = '複製本文標準網址 (Canonical URL)'; }}, 2500);
+      }});
+    }}
+  </script>
+</body>
+</html>"""
+    (out_dir / 'index.html').write_text(article_page, encoding='utf-8')
+
+  # Build Home Page (index.html)
+  cat_buttons = []
+  for idx, cat in enumerate(site_cfg.get('categories', ['全部'])):
+    active_cls = 'active' if idx == 0 else ''
+    cat_buttons.append(
+        f'<button type="button" class="cat-tab {active_cls}" data-cat="{html.escape(cat)}" id="cat-btn-{idx}">{html.escape(cat)}</button>'
+    )
+
+  cards_html = []
+  for p in posts:
+    tags_badges = ''.join(f'<span class="tag-badge">#{html.escape(t)}</span>' for t in p['tags'])
+    cards_html.append(f"""<article class="post-card" data-category="{html.escape(p['category'])}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
+      <div class="post-meta">
+        <span class="post-category">{html.escape(p['category'])}</span>
+        <span>·</span>
+        <time datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
+      </div>
+      <a href="posts/{p['slug']}/index.html" id="post-link-{p['slug']}">
+        <h2 class="post-card-title">{html.escape(p['title'])}</h2>
+        <p class="post-summary">{html.escape(p['summary'])}</p>
+      </a>
+      <div class="post-tags">{tags_badges}</div>
+    </article>""")
+
+  index_page = f"""{head_html(f"{site_cfg['title']} — {site_cfg['subtitle']}", site_cfg['subtitle'], "assets/index.css", site_cfg['base_url'])}
+<body>
+  {header_nav(site_cfg, "index.html")}
+  <section class="hero-section">
+    <span class="hero-eyebrow">COSMOS · ARTIFICIAL INTELLIGENCE · PHILOSOPHY</span>
+    <h1 class="hero-title">{html.escape(site_cfg['title'])}</h1>
+    <p class="hero-subtitle">{html.escape(site_cfg['subtitle'])}</p>
+  </section>
+
+  <section class="filter-bar" aria-label="文章分類與搜尋">
+    <div class="category-tabs" id="category-tabs">
+      {''.join(cat_buttons)}
+    </div>
+    <input type="search" class="search-input" id="post-search-input" placeholder="搜尋議題、關鍵字..." aria-label="搜尋文章">
+  </section>
+
+  <main class="main-container" id="posts-list">
+    {''.join(cards_html)}
+  </main>
+
+  <footer class="site-footer">
+    <p>© {html.escape(site_cfg['author'])} · {html.escape(site_cfg['title'])} · 公開免費發表，歡迎引用與延伸思辨</p>
+  </footer>
+  {theme_script()}
+  <script>
+    const tabs = document.querySelectorAll('.cat-tab');
+    const searchInput = document.getElementById('post-search-input');
+    const cards = document.querySelectorAll('.post-card');
+    let activeCat = '全部';
+
+    function filterPosts() {{
+      const q = (searchInput.value || '').trim().toLowerCase();
+      cards.forEach(card => {{
+        const catMatch = activeCat === '全部' || card.dataset.category === activeCat;
+        const searchMatch = !q || card.dataset.search.includes(q);
+        card.style.display = (catMatch && searchMatch) ? '' : 'none';
+      }});
+    }}
+
+    tabs.forEach(tab => {{
+      tab.addEventListener('click', () => {{
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeCat = tab.dataset.cat;
+        filterPosts();
+      }});
+    }});
+
+    if (searchInput) {{
+      searchInput.addEventListener('input', filterPosts);
+    }}
+  </script>
+</body>
+</html>"""
+  (ROOT / 'index.html').write_text(index_page, encoding='utf-8')
+  print(f'Successfully built {len(posts)} post(s) -> index.html')
+
+
+if __name__ == '__main__':
+  build_site()
