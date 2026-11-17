@@ -271,16 +271,6 @@ def build_site():
         <p class="article-subtitle">{html.escape(summary)}</p>
       </header>
 
-      <aside class="sync-toolbar" aria-label="跨平台同步工具">
-        <div class="sync-toolbar-label">
-          <span>⇄ 跨平台發表工具：一鍵複製排好版的內容貼至「方格子 vocus」或「Medium」</span>
-        </div>
-        <div class="sync-toolbar-actions">
-          <button type="button" class="icon-btn" id="copy-rich-btn">複製方格子 / Medium 排版內文</button>
-          <button type="button" class="icon-btn" id="copy-url-btn">複製本文標準網址 (Canonical URL)</button>
-        </div>
-      </aside>
-
       <div class="article-body" id="article-content">
         {site_html}
       </div>
@@ -290,46 +280,11 @@ def build_site():
         <a href="../../index.html" class="icon-btn" id="back-to-home-btn">← 返回所有思辨文章</a>
       </footer>
     </article>
-
-    <div id="portable-copy-source" style="position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;">
-      <h1>{html.escape(title)}</h1>
-      <p><em>{html.escape(summary)}</em></p>
-      <hr>
-      {portable_html}
-      <hr>
-      <p><em>本文首發於 <a href="{html.escape(post_url)}">{html.escape(site_cfg['title'])}</a>，歡迎留言交流宇宙、AI 與哲學思辨。</em></p>
-    </div>
   </main>
   <footer class="site-footer">
     <p>© {html.escape(site_cfg['author'])} · {html.escape(site_cfg['title'])} · Hosted on GitHub Pages</p>
   </footer>
   {theme_script()}
-  <script>
-    const copyRichBtn = document.getElementById('copy-rich-btn');
-    if (copyRichBtn) {{
-      copyRichBtn.addEventListener('click', async () => {{
-        const src = document.getElementById('portable-copy-source');
-        try {{
-          const blobHtml = new Blob([src.innerHTML], {{ type: 'text/html' }});
-          const blobText = new Blob([src.innerText], {{ type: 'text/plain' }});
-          await navigator.clipboard.write([new ClipboardItem({{ 'text/html': blobHtml, 'text/plain': blobText }})]);
-          copyRichBtn.textContent = '✓ 已複製！可直接貼上至方格子或 Medium';
-          setTimeout(() => {{ copyRichBtn.textContent = '複製方格子 / Medium 排版內文'; }}, 3000);
-        }} catch (e) {{
-          await navigator.clipboard.writeText(src.innerText);
-          copyRichBtn.textContent = '✓ 已複製純文字格式';
-        }}
-      }});
-    }}
-    const copyUrlBtn = document.getElementById('copy-url-btn');
-    if (copyUrlBtn) {{
-      copyUrlBtn.addEventListener('click', async () => {{
-        await navigator.clipboard.writeText(window.location.href);
-        copyUrlBtn.textContent = '✓ 已複製網址';
-        setTimeout(() => {{ copyUrlBtn.textContent = '複製本文標準網址 (Canonical URL)'; }}, 2500);
-      }});
-    }}
-  </script>
 </body>
 </html>"""
     (out_dir / 'index.html').write_text(article_page, encoding='utf-8')

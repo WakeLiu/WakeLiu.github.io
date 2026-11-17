@@ -49,16 +49,6 @@
         <p class="article-subtitle">我們活著的這個時代真的太特別了。在奇點來臨的前夕，想透過與 AI 的對話與自我思辨，在這裡發表點什麼、留下些什麼。有緣，便請閱讀吧。</p>
       </header>
 
-      <aside class="sync-toolbar" aria-label="跨平台同步工具">
-        <div class="sync-toolbar-label">
-          <span>⇄ 跨平台發表工具：一鍵複製排好版的內容貼至「方格子 vocus」或「Medium」</span>
-        </div>
-        <div class="sync-toolbar-actions">
-          <button type="button" class="icon-btn" id="copy-rich-btn">複製方格子 / Medium 排版內文</button>
-          <button type="button" class="icon-btn" id="copy-url-btn">複製本文標準網址 (Canonical URL)</button>
-        </div>
-      </aside>
-
       <div class="article-body" id="article-content">
         <p>我們活著的這個時代，真的太特別了。</p>
 <p>過去千百年來只存在於哲學家腦海或科幻小說裡的提問——關於智慧的本質、意識的邊界、乃至於宇宙如何透過觀察者認識自身——如今都在我們眼前真實上演。站在這樣一個劇烈變動的「奇點前夕」，總覺得應該發表點什麼，或者至少，為這個特別的時代留下些什麼。</p>
@@ -74,21 +64,6 @@
         <a href="../../index.html" class="icon-btn" id="back-to-home-btn">← 返回所有思辨文章</a>
       </footer>
     </article>
-
-    <div id="portable-copy-source" style="position: fixed; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;">
-      <h1>楔子</h1>
-      <p><em>我們活著的這個時代真的太特別了。在奇點來臨的前夕，想透過與 AI 的對話與自我思辨，在這裡發表點什麼、留下些什麼。有緣，便請閱讀吧。</em></p>
-      <hr>
-      <p>我們活著的這個時代，真的太特別了。</p>
-<p>過去千百年來只存在於哲學家腦海或科幻小說裡的提問——關於智慧的本質、意識的邊界、乃至於宇宙如何透過觀察者認識自身——如今都在我們眼前真實上演。站在這樣一個劇烈變動的「奇點前夕」，總覺得應該發表點什麼，或者至少，為這個特別的時代留下些什麼。</p>
-<p>這便是我創立這個部落格的原因。</p>
-<p>未來這裡發表的文章，會圍繞著<strong>宇宙、AI 與哲學</strong>的議題展開。誠實地說，這裡面也許有些文字是透過 AI 協助撰寫與生成的；但每一篇文章背後的起心動念、每一次對話裡的詰問與反駁，都是我經過自我思辨、消化與整理後的結果。</p>
-<p>AI 就像一面深邃的透鏡，幫助我把腦中模糊的直覺折射成清晰的文字，但那個凝視星空、提出問題的人，始終是我自己。</p>
-<blockquote><p><em>We are a way for the cosmos to know itself.</em></p></blockquote>
-<p>在浩瀚的網路與宇宙裡，不刻意追求流量，也不強求標準答案。如果你恰好來到這裡，有緣，就閱讀吧。</p>
-      <hr>
-      <p><em>本文首發於 <a href="https://wakeliu.github.io/posts/2026-11-17-prologue/">奇點前夕</a>，歡迎留言交流宇宙、AI 與哲學思辨。</em></p>
-    </div>
   </main>
   <footer class="site-footer">
     <p>© Wake Liu · 奇點前夕 · Hosted on GitHub Pages</p>
@@ -107,31 +82,5 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
-  <script>
-    const copyRichBtn = document.getElementById('copy-rich-btn');
-    if (copyRichBtn) {
-      copyRichBtn.addEventListener('click', async () => {
-        const src = document.getElementById('portable-copy-source');
-        try {
-          const blobHtml = new Blob([src.innerHTML], { type: 'text/html' });
-          const blobText = new Blob([src.innerText], { type: 'text/plain' });
-          await navigator.clipboard.write([new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })]);
-          copyRichBtn.textContent = '✓ 已複製！可直接貼上至方格子或 Medium';
-          setTimeout(() => { copyRichBtn.textContent = '複製方格子 / Medium 排版內文'; }, 3000);
-        } catch (e) {
-          await navigator.clipboard.writeText(src.innerText);
-          copyRichBtn.textContent = '✓ 已複製純文字格式';
-        }
-      });
-    }
-    const copyUrlBtn = document.getElementById('copy-url-btn');
-    if (copyUrlBtn) {
-      copyUrlBtn.addEventListener('click', async () => {
-        await navigator.clipboard.writeText(window.location.href);
-        copyUrlBtn.textContent = '✓ 已複製網址';
-        setTimeout(() => { copyUrlBtn.textContent = '複製本文標準網址 (Canonical URL)'; }, 2500);
-      });
-    }
-  </script>
 </body>
 </html>
