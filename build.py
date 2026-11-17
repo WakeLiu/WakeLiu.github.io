@@ -197,20 +197,16 @@ def head_html(
 </head>"""
 
 
-def header_nav(site_cfg: dict, home_href: str) -> str:
-  title_en = site_cfg.get('title_en', '')
-  en_span = (
-      f'<span class="brand-title-en">{html.escape(title_en)}</span>'
-      if title_en
-      else ''
+def header_nav(site_cfg: dict, home_href: str, is_home: bool = False) -> str:
+  left_el = (
+      '<div></div>'
+      if is_home
+      else f'<a href="{home_href}" class="icon-btn" id="nav-home-link">← 返回所有文章</a>'
   )
-  return f"""<header class="site-header">
+  header_cls = 'site-header site-header-home' if is_home else 'site-header'
+  return f"""<header class="{header_cls}">
   <div class="header-inner">
-    <a href="{home_href}" class="brand-link" id="nav-home-link">
-      <span class="brand-symbol">✦</span>
-      <span class="brand-title">{html.escape(site_cfg['title'])}</span>
-      {en_span}
-    </a>
+    {left_el}
     <div class="header-actions">
       <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="切換深淺色主題">
         <span id="theme-toggle-label">切換日／夜視角</span>
@@ -368,7 +364,7 @@ def build_site():
   )
   index_page = f"""{head_html(f"{site_cfg['title']} {site_cfg.get('title_en', '')} — {site_cfg['subtitle']}", site_cfg['subtitle'], "assets/index.css", site_cfg['base_url'])}
 <body>
-  {header_nav(site_cfg, "index.html")}
+  {header_nav(site_cfg, "index.html", is_home=True)}
   <section class="hero-section">
     <span class="hero-eyebrow">COSMOS · ARTIFICIAL INTELLIGENCE · PHILOSOPHY</span>
     <h1 class="hero-title">{html.escape(site_cfg['title'])}{hero_en}</h1>

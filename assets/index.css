@@ -137,6 +137,13 @@ a {
   background-color: color-mix(in srgb, var(--bg-primary) 85%, transparent);
 }
 
+.site-header-home {
+  border-bottom: none;
+  background-color: transparent;
+  backdrop-filter: none;
+  position: relative;
+}
+
 .header-inner {
   max-width: var(--max-width-layout);
   margin: 0 auto;
