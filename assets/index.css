@@ -1,20 +1,20 @@
 :root {
-  /* Dark Cosmic Editorial Theme (Default) */
-  --bg-primary: hsl(220, 20%, 6%);
-  --bg-elevated: hsl(220, 18%, 10%);
-  --bg-dialogue-human: hsl(215, 22%, 12%);
-  --bg-dialogue-ai: hsl(220, 16%, 9%);
-  --surface-hover: hsl(220, 16%, 14%);
-  --text-primary: hsl(40, 20%, 92%);
-  --text-secondary: hsl(215, 14%, 68%);
-  --text-muted: hsl(215, 12%, 48%);
-  --accent-gold: hsl(38, 72%, 62%);
-  --accent-gold-subtle: hsla(38, 72%, 62%, 0.14);
-  --accent-cyan: hsl(192, 55%, 58%);
-  --accent-cyan-subtle: hsla(192, 55%, 58%, 0.12);
-  --border-subtle: hsla(40, 20%, 90%, 0.09);
-  --border-strong: hsla(40, 20%, 90%, 0.18);
-  --shadow-soft: 0 12px 32px -8px rgba(0, 0, 0, 0.55);
+  /* Dark Cosmic Editorial Theme (Default — Deep Midnight Navy, Not Pure Black) */
+  --bg-primary: hsl(222, 34%, 11%);
+  --bg-elevated: hsl(222, 30%, 15%);
+  --bg-dialogue-human: hsl(218, 32%, 16%);
+  --bg-dialogue-ai: hsl(222, 28%, 13%);
+  --surface-hover: hsl(220, 26%, 19%);
+  --text-primary: hsl(40, 25%, 93%);
+  --text-secondary: hsl(215, 18%, 74%);
+  --text-muted: hsl(215, 14%, 56%);
+  --accent-gold: hsl(38, 76%, 66%);
+  --accent-gold-subtle: hsla(38, 76%, 66%, 0.15);
+  --accent-cyan: hsl(192, 60%, 62%);
+  --accent-cyan-subtle: hsla(192, 60%, 62%, 0.14);
+  --border-subtle: hsla(210, 30%, 90%, 0.11);
+  --border-strong: hsla(210, 30%, 90%, 0.22);
+  --shadow-soft: 0 12px 32px -8px rgba(4, 8, 20, 0.55);
 
   --font-serif: 'Iansui', 'LXGW WenKai TC', 'FangSong', 'STFangsong', serif;
   --font-sans: 'Iansui', 'LXGW WenKai TC', 'FangSong', 'STFangsong', -apple-system, BlinkMacSystemFont, serif;
@@ -63,9 +63,62 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
   transition: background-color 0.25s ease, color 0.25s ease;
-  background-image: radial-gradient(circle at 20% 15%, hsla(38, 70%, 60%, 0.04) 0%, transparent 45%),
-                    radial-gradient(circle at 80% 80%, hsla(192, 60%, 55%, 0.035) 0%, transparent 50%);
+  background-image:
+    radial-gradient(ellipse 80% 55% at 18% 12%, hsla(214, 52%, 24%, 0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 50% at 85% 82%, hsla(200, 48%, 20%, 0.35) 0%, transparent 65%),
+    radial-gradient(circle at 50% 45%, hsla(38, 70%, 60%, 0.035) 0%, transparent 55%);
+  background-attachment: fixed;
+}
+
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(circle at 20% 15%, hsla(38, 70%, 60%, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 80% 80%, hsla(198, 50%, 50%, 0.04) 0%, transparent 50%);
+}
+
+/* Sparse Cosmic Starpoints (9 quiet stars across the entire viewport in dark mode) */
+html:not([data-theme="light"]) body::before,
+html:not([data-theme="light"]) body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+html:not([data-theme="light"]) body::before {
+  background-image:
+    radial-gradient(1.5px 1.5px at 14% 16%, hsla(42, 80%, 92%, 0.78) 0%, hsla(42, 80%, 92%, 0.15) 60%, transparent 100%),
+    radial-gradient(1px 1px at 83% 12%, hsla(200, 60%, 92%, 0.55) 0%, transparent 100%),
+    radial-gradient(2px 2px at 78% 38%, hsla(38, 85%, 86%, 0.72) 0%, hsla(38, 85%, 86%, 0.18) 55%, transparent 100%),
+    radial-gradient(1px 1px at 24% 48%, hsla(40, 40%, 94%, 0.45) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 11% 76%, hsla(195, 70%, 90%, 0.62) 0%, transparent 100%);
+  animation: cosmic-breathe 9s ease-in-out infinite alternate;
+}
+
+html:not([data-theme="light"]) body::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 56% 21%, hsla(40, 60%, 94%, 0.52) 0%, transparent 100%),
+    radial-gradient(1px 1px at 67% 66%, hsla(40, 50%, 92%, 0.42) 0%, transparent 100%),
+    radial-gradient(2px 2px at 88% 81%, hsla(42, 75%, 88%, 0.68) 0%, hsla(42, 75%, 88%, 0.15) 55%, transparent 100%),
+    radial-gradient(1px 1px at 36% 87%, hsla(205, 65%, 92%, 0.48) 0%, transparent 100%);
+  animation: cosmic-breathe 13s ease-in-out 2s infinite alternate;
+}
+
+@keyframes cosmic-breathe {
+  0% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+.site-header,
+.hero-section,
+.filter-bar,
+.main-container,
+.site-footer {
+  position: relative;
+  z-index: 1;
 }
 
 a {
