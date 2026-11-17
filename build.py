@@ -265,7 +265,7 @@ def build_site():
           <span>·</span>
           <time datetime="{html.escape(date)}">{html.escape(date)}</time>
           <span>·</span>
-          <span>作者：{html.escape(site_cfg['author'])} × AI</span>
+          <span>作者：{html.escape(site_cfg['author'])}</span>
         </div>
         <h1 class="article-title">{html.escape(title)}</h1>
         <p class="article-subtitle">{html.escape(summary)}</p>
