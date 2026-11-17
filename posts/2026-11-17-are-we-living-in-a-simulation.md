@@ -1,7 +1,6 @@
 ---
 title: 我們活在虛擬世界裡嗎？
 date: 2026-11-17
-category: 宇宙論
 tags: 模擬假說, 雙狹縫實驗, 因果律, 奇點前夕
 summary: 人類歷史也不過五千年，AI 就已經發展至此。如果五千年後我們有能力模擬宇宙，那麼現在的我們，會不會其實也活在虛擬世界裡？
 image: assets/images/2026-11-17-are-we-living-in-a-simulation.jpg
