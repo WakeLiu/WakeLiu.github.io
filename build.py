@@ -262,8 +262,6 @@ def build_site():
     meta, body = parse_frontmatter(raw)
     title = meta.get('title', slug)
     date = meta.get('date', '')
-    category = meta.get('category', '生命科學')
-    categories = [c.strip() for c in category.split(',') if c.strip()]
     tags = [t.strip() for t in meta.get('tags', '').split(',') if t.strip()]
     summary = meta.get('summary', '')
     image = meta.get('image', '').strip().lstrip('/')
@@ -279,8 +277,6 @@ def build_site():
         'title': title,
         'date': date,
         'created_ts': get_file_created_ts(md_file),
-        'category': category,
-        'categories': categories,
         'tags': tags,
         'summary': summary,
         'image': image,
@@ -302,9 +298,6 @@ def build_site():
         else ''
     )
 
-    cats_meta_html = '<span>·</span>'.join(
-        f'<span class="post-category">{html.escape(c)}</span>' for c in categories
-    )
     article_page = f"""{head_html(f"{title} | {site_cfg['title']}", summary, "../../assets/index.css", post_url, og_image_url)}
 <body>
   {header_nav(site_cfg, "../../index.html")}
@@ -312,8 +305,6 @@ def build_site():
     <article>
       <header class="article-header">
         <div class="post-meta">
-          {cats_meta_html}
-          <span>·</span>
           <time datetime="{html.escape(date)}">{html.escape(date)}</time>
           <span>·</span>
           <span>作者：{html.escape(site_cfg['author'])}</span>
@@ -363,17 +354,45 @@ def build_site():
   # Sort posts newest first: by date (descending), then by creation timestamp (descending)
   posts.sort(key=lambda p: (p['date'], p['created_ts']), reverse=True)
 
+  # Compute weighted tag ranking (more recent + higher frequency first)
+  tag_stats = {}
+  for post_idx, p in enumerate(posts):
+    recency_weight = 1.0 / (post_idx + 1)
+    for tag_pos, t in enumerate(p['tags']):
+      if t not in tag_stats:
+        tag_stats[t] = {
+            'count': 0,
+            'score': 0.0,
+            'first_post_idx': post_idx,
+            'first_tag_pos': tag_pos,
+        }
+      tag_stats[t]['count'] += 1
+      tag_stats[t]['score'] += 1.5 + recency_weight
+
+  ranked_tags = sorted(
+      tag_stats.keys(),
+      key=lambda t: (
+          -tag_stats[t]['score'],
+          tag_stats[t]['first_post_idx'],
+          tag_stats[t]['first_tag_pos'],
+      ),
+  )
+
   # Build Home Page (index.html)
-  cat_buttons = []
-  for idx, cat in enumerate(site_cfg.get('categories', ['全部'])):
-    active_cls = 'active' if idx == 0 else ''
+  cat_buttons = [
+      '<button type="button" class="cat-tab active" data-cat="全部" id="cat-btn-0">全部</button>'
+  ]
+  for idx, t in enumerate(ranked_tags, start=1):
     cat_buttons.append(
-        f'<button type="button" class="cat-tab {active_cls}" data-cat="{html.escape(cat)}" id="cat-btn-{idx}">{html.escape(cat)}</button>'
+        f'<button type="button" class="cat-tab" data-cat="{html.escape(t)}" id="cat-btn-{idx}">#{html.escape(t)}</button>'
     )
 
   cards_html = []
   for p in posts:
-    tags_badges = ''.join(f'<span class="tag-badge">#{html.escape(t)}</span>' for t in p['tags'])
+    tags_badges = ''.join(
+        f'<span class="tag-badge" data-tag="{html.escape(t)}" style="cursor:pointer;">#{html.escape(t)}</span>'
+        for t in p['tags']
+    )
     cover_html = (
         f'<div class="post-card-cover">'
         f'<img src="{html.escape(p["image"])}" alt="{html.escape(p["title"])}" class="post-card-img" loading="lazy">'
@@ -381,14 +400,8 @@ def build_site():
         if p.get('image')
         else ''
     )
-    card_cats_html = '<span>·</span>'.join(
-        f'<span class="post-category">{html.escape(c)}</span>'
-        for c in p['categories']
-    )
-    cards_html.append(f"""<article class="post-card" data-category="{html.escape(','.join(p['categories']))}" data-tags="{html.escape(','.join(p['tags']))}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
+    cards_html.append(f"""<article class="post-card" data-tags="{html.escape(','.join(p['tags']))}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
       <div class="post-meta">
-        {card_cats_html}
-        <span>·</span>
         <time datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
         <span>·</span>
         <span>觀看人次：<span class="card-view-count" data-post-url="{html.escape(p['url'])}">—</span></span>
@@ -439,9 +452,8 @@ def build_site():
     function filterPosts() {{
       const q = (searchInput.value || '').trim().toLowerCase();
       cards.forEach(card => {{
-        const cats = (card.dataset.category || '').split(',');
         const tags = (card.dataset.tags || '').split(',');
-        const catMatch = activeCat === '全部' || cats.includes(activeCat) || tags.includes(activeCat);
+        const catMatch = activeCat === '全部' || tags.includes(activeCat);
         const searchMatch = !q || card.dataset.search.includes(q);
         card.style.display = (catMatch && searchMatch) ? '' : 'none';
       }});
@@ -452,6 +464,21 @@ def build_site():
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         activeCat = tab.dataset.cat;
+        filterPosts();
+      }});
+    }});
+
+    document.querySelectorAll('.tag-badge[data-tag]').forEach(badge => {{
+      badge.addEventListener('click', () => {{
+        const targetTag = badge.dataset.tag;
+        tabs.forEach(t => {{
+          if (t.dataset.cat === targetTag) {{
+            t.classList.add('active');
+          }} else {{
+            t.classList.remove('active');
+          }}
+        }});
+        activeCat = targetTag;
         filterPosts();
       }});
     }});
