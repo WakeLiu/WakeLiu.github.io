@@ -198,15 +198,11 @@ def head_html(
 
 
 def header_nav(site_cfg: dict, home_href: str, is_home: bool = False) -> str:
-  left_el = (
-      '<div></div>'
-      if is_home
-      else f'<a href="{home_href}" class="icon-btn" id="nav-home-link">← 返回所有文章</a>'
-  )
-  header_cls = 'site-header site-header-home' if is_home else 'site-header'
-  return f"""<header class="{header_cls}">
+  if is_home:
+    return ''
+  return f"""<header class="site-header">
   <div class="header-inner">
-    {left_el}
+    <a href="{home_href}" class="icon-btn" id="nav-home-link">← 返回所有文章</a>
     <div class="header-actions">
       <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="切換深淺色主題">
         <span id="theme-toggle-label">切換日／夜視角</span>
@@ -383,7 +379,7 @@ def build_site():
   </main>
 
   <footer class="site-footer">
-    <p>© {html.escape(site_cfg['author'])} · {html.escape(site_cfg['title'])} · 公開免費發表，歡迎引用與延伸思辨</p>
+    <p>© {html.escape(site_cfg['author'])} · {html.escape(site_cfg['title'])} · 公開免費發表，歡迎引用與延伸思辨 · <button type="button" id="theme-toggle-btn" style="background:none;border:none;color:var(--text-muted);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:inherit;">切換日／夜視角</button></p>
   </footer>
   {theme_script()}
   <script>
