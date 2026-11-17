@@ -198,11 +198,18 @@ def head_html(
 
 
 def header_nav(site_cfg: dict, home_href: str) -> str:
+  title_en = site_cfg.get('title_en', '')
+  en_span = (
+      f'<span class="brand-title-en">{html.escape(title_en)}</span>'
+      if title_en
+      else ''
+  )
   return f"""<header class="site-header">
   <div class="header-inner">
     <a href="{home_href}" class="brand-link" id="nav-home-link">
       <span class="brand-symbol">✦</span>
       <span class="brand-title">{html.escape(site_cfg['title'])}</span>
+      {en_span}
     </a>
     <div class="header-actions">
       <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="切換深淺色主題">
@@ -354,12 +361,17 @@ def build_site():
       <div class="post-tags">{tags_badges}</div>
     </article>""")
 
-  index_page = f"""{head_html(f"{site_cfg['title']} — {site_cfg['subtitle']}", site_cfg['subtitle'], "assets/index.css", site_cfg['base_url'])}
+  hero_en = (
+      f'<span class="hero-title-en">{html.escape(site_cfg.get("title_en", ""))}</span>'
+      if site_cfg.get('title_en')
+      else ''
+  )
+  index_page = f"""{head_html(f"{site_cfg['title']} {site_cfg.get('title_en', '')} — {site_cfg['subtitle']}", site_cfg['subtitle'], "assets/index.css", site_cfg['base_url'])}
 <body>
   {header_nav(site_cfg, "index.html")}
   <section class="hero-section">
     <span class="hero-eyebrow">COSMOS · ARTIFICIAL INTELLIGENCE · PHILOSOPHY</span>
-    <h1 class="hero-title">{html.escape(site_cfg['title'])}</h1>
+    <h1 class="hero-title">{html.escape(site_cfg['title'])}{hero_en}</h1>
     <p class="hero-subtitle">{html.escape(site_cfg['subtitle'])}</p>
   </section>
 
