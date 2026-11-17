@@ -6,8 +6,26 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 
 ROOT = Path(__file__).parent.resolve()
+
+
+def get_file_created_ts(md_file: Path) -> int:
+  try:
+    res = subprocess.run(
+        ['git', 'log', '--diff-filter=A', '--follow', '--format=%ct', '-1', '--', str(md_file)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    out = res.stdout.strip()
+    if out:
+      return int(out.splitlines()[-1])
+  except Exception:
+    pass
+  return int(md_file.stat().st_mtime)
 
 
 def parse_frontmatter(text: str):
@@ -260,6 +278,7 @@ def build_site():
         'slug': slug,
         'title': title,
         'date': date,
+        'created_ts': get_file_created_ts(md_file),
         'category': category,
         'categories': categories,
         'tags': tags,
@@ -340,6 +359,9 @@ def build_site():
 </body>
 </html>"""
     (out_dir / 'index.html').write_text(article_page, encoding='utf-8')
+
+  # Sort posts newest first: by date (descending), then by creation timestamp (descending)
+  posts.sort(key=lambda p: (p['date'], p['created_ts']), reverse=True)
 
   # Build Home Page (index.html)
   cat_buttons = []
