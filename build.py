@@ -313,7 +313,7 @@ def build_site():
 
       <footer style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div class="post-tags">{tags_html}</div>
-        <a href="../../index.html" class="icon-btn" id="back-to-home-btn">← 返回所有思辨文章</a>
+        <a href="../../index.html" class="icon-btn" id="back-to-home-btn">← 返回所有文章</a>
       </footer>
     </article>
   </main>
