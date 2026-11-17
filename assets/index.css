@@ -1,20 +1,20 @@
 :root {
-  /* Dark Cosmic Editorial Theme (Deep Midnight Indigo-Purple) */
-  --bg-primary: hsl(252, 32%, 11%);
-  --bg-elevated: hsl(250, 28%, 15%);
-  --bg-dialogue-human: hsl(248, 30%, 16%);
-  --bg-dialogue-ai: hsl(252, 26%, 13%);
-  --surface-hover: hsl(250, 26%, 19%);
-  --text-primary: hsl(40, 25%, 94%);
-  --text-secondary: hsl(245, 16%, 76%);
-  --text-muted: hsl(245, 12%, 58%);
-  --accent-gold: hsl(38, 78%, 68%);
-  --accent-gold-subtle: hsla(38, 78%, 68%, 0.15);
-  --accent-cyan: hsl(192, 60%, 64%);
-  --accent-cyan-subtle: hsla(192, 60%, 64%, 0.14);
-  --border-subtle: hsla(245, 30%, 90%, 0.12);
-  --border-strong: hsla(245, 30%, 90%, 0.24);
-  --shadow-soft: 0 12px 32px -8px rgba(8, 5, 24, 0.6);
+  /* Dark Cosmic Editorial Theme (Deep Abyssal Midnight Purple) */
+  --bg-primary: hsl(252, 34%, 7.5%);
+  --bg-elevated: hsl(250, 30%, 11.5%);
+  --bg-dialogue-human: hsl(248, 30%, 12.5%);
+  --bg-dialogue-ai: hsl(252, 28%, 10%);
+  --surface-hover: hsl(250, 26%, 15%);
+  --text-primary: hsl(40, 25%, 93%);
+  --text-secondary: hsl(245, 16%, 73%);
+  --text-muted: hsl(245, 12%, 54%);
+  --accent-gold: hsl(38, 76%, 66%);
+  --accent-gold-subtle: hsla(38, 76%, 66%, 0.14);
+  --accent-cyan: hsl(192, 60%, 62%);
+  --accent-cyan-subtle: hsla(192, 60%, 62%, 0.13);
+  --border-subtle: hsla(245, 30%, 90%, 0.1);
+  --border-strong: hsla(245, 30%, 90%, 0.2);
+  --shadow-soft: 0 12px 32px -8px rgba(5, 3, 16, 0.65);
 
   --font-serif: 'Iansui', 'LXGW WenKai TC', 'FangSong', 'STFangsong', serif;
   --font-sans: 'Iansui', 'LXGW WenKai TC', 'FangSong', 'STFangsong', -apple-system, BlinkMacSystemFont, serif;
@@ -66,9 +66,9 @@ body {
   position: relative;
   transition: background-color 0.25s ease, color 0.25s ease;
   background-image:
-    radial-gradient(ellipse 80% 55% at 18% 12%, hsla(266, 48%, 26%, 0.48) 0%, transparent 65%),
-    radial-gradient(ellipse 75% 55% at 85% 82%, hsla(238, 46%, 24%, 0.44) 0%, transparent 65%),
-    radial-gradient(circle at 65% 35%, hsla(280, 40%, 22%, 0.26) 0%, transparent 55%);
+    radial-gradient(ellipse 80% 55% at 18% 12%, hsla(264, 46%, 18%, 0.42) 0%, transparent 65%),
+    radial-gradient(ellipse 75% 55% at 85% 82%, hsla(238, 44%, 16%, 0.38) 0%, transparent 65%),
+    radial-gradient(circle at 65% 35%, hsla(276, 38%, 15%, 0.22) 0%, transparent 55%);
   background-attachment: fixed;
 }
 
@@ -78,7 +78,7 @@ body {
     radial-gradient(circle at 80% 80%, hsla(198, 50%, 50%, 0.04) 0%, transparent 50%);
 }
 
-/* Sparse Cosmic Starpoints (9 clearly visible glowing stars across the viewport in dark mode) */
+/* Sparse Cosmic Starpoints (9 fine pinpoint stars across the viewport in dark mode) */
 html:not([data-theme="light"]) body::before,
 html:not([data-theme="light"]) body::after {
   content: "";
@@ -90,21 +90,21 @@ html:not([data-theme="light"]) body::after {
 
 html:not([data-theme="light"]) body::before {
   background-image:
-    radial-gradient(circle at 12% 18%, hsla(45, 100%, 97%, 0.98) 0px, hsla(42, 95%, 82%, 0.75) 2px, hsla(42, 90%, 75%, 0.22) 7px, transparent 14px),
-    radial-gradient(circle at 84% 14%, hsla(200, 100%, 97%, 0.92) 0px, hsla(200, 90%, 85%, 0.65) 1.6px, hsla(200, 85%, 75%, 0.18) 6px, transparent 11px),
-    radial-gradient(circle at 79% 42%, hsla(40, 100%, 96%, 0.95) 0px, hsla(38, 95%, 80%, 0.7) 2.2px, hsla(38, 90%, 70%, 0.2) 8px, transparent 15px),
-    radial-gradient(circle at 22% 52%, hsla(260, 100%, 97%, 0.88) 0px, hsla(255, 85%, 86%, 0.55) 1.5px, hsla(255, 80%, 75%, 0.15) 5px, transparent 10px),
-    radial-gradient(circle at 10% 78%, hsla(195, 100%, 97%, 0.92) 0px, hsla(195, 90%, 84%, 0.65) 1.8px, hsla(195, 85%, 75%, 0.18) 6px, transparent 12px);
-  animation: cosmic-breathe 7s ease-in-out infinite alternate;
+    radial-gradient(circle at 12% 18%, hsla(45, 100%, 96%, 0.9) 0px, hsla(42, 90%, 80%, 0.5) 1px, transparent 3.5px),
+    radial-gradient(circle at 84% 14%, hsla(200, 100%, 96%, 0.82) 0px, hsla(200, 85%, 82%, 0.4) 0.8px, transparent 2.8px),
+    radial-gradient(circle at 79% 42%, hsla(40, 100%, 95%, 0.88) 0px, hsla(38, 90%, 78%, 0.48) 1.1px, transparent 4px),
+    radial-gradient(circle at 22% 52%, hsla(260, 100%, 96%, 0.78) 0px, hsla(255, 80%, 84%, 0.35) 0.8px, transparent 2.6px),
+    radial-gradient(circle at 10% 78%, hsla(195, 100%, 96%, 0.85) 0px, hsla(195, 85%, 82%, 0.42) 0.9px, transparent 3px);
+  animation: cosmic-breathe 8s ease-in-out infinite alternate;
 }
 
 html:not([data-theme="light"]) body::after {
   background-image:
-    radial-gradient(circle at 58% 20%, hsla(42, 100%, 97%, 0.9) 0px, hsla(42, 90%, 84%, 0.6) 1.6px, hsla(42, 85%, 75%, 0.16) 6px, transparent 11px),
-    radial-gradient(circle at 68% 68%, hsla(220, 100%, 97%, 0.88) 0px, hsla(220, 85%, 85%, 0.55) 1.5px, hsla(220, 80%, 75%, 0.15) 5px, transparent 10px),
-    radial-gradient(circle at 89% 82%, hsla(44, 100%, 97%, 0.96) 0px, hsla(42, 95%, 82%, 0.72) 2px, hsla(42, 90%, 72%, 0.22) 7px, transparent 14px),
-    radial-gradient(circle at 34% 88%, hsla(205, 100%, 97%, 0.9) 0px, hsla(205, 90%, 85%, 0.6) 1.7px, hsla(205, 85%, 75%, 0.16) 6px, transparent 11px);
-  animation: cosmic-breathe 10s ease-in-out 1.5s infinite alternate;
+    radial-gradient(circle at 58% 20%, hsla(42, 100%, 96%, 0.82) 0px, hsla(42, 85%, 82%, 0.4) 0.8px, transparent 2.8px),
+    radial-gradient(circle at 68% 68%, hsla(220, 100%, 96%, 0.76) 0px, hsla(220, 80%, 84%, 0.35) 0.8px, transparent 2.5px),
+    radial-gradient(circle at 89% 82%, hsla(44, 100%, 96%, 0.88) 0px, hsla(42, 90%, 80%, 0.45) 1px, transparent 3.5px),
+    radial-gradient(circle at 34% 88%, hsla(205, 100%, 96%, 0.8) 0px, hsla(205, 85%, 82%, 0.38) 0.8px, transparent 2.8px);
+  animation: cosmic-breathe 11s ease-in-out 1.5s infinite alternate;
 }
 
 @keyframes cosmic-breathe {
