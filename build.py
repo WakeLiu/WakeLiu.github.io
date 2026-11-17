@@ -304,15 +304,15 @@ def build_site():
   <main class="main-container">
     <article>
       <header class="article-header">
-        <div class="post-meta">
-          <time datetime="{html.escape(date)}">{html.escape(date)}</time>
-          <span>·</span>
-          <span>作者：{html.escape(site_cfg['author'])}</span>
-          <span>·</span>
-          <span>觀看人次：<span id="article-view-count">—</span></span>
+        <div class="article-title-row">
+          <h1 class="article-title">{html.escape(title)}</h1>
+          <time class="post-card-date" datetime="{html.escape(date)}">{html.escape(date)}</time>
         </div>
-        <h1 class="article-title">{html.escape(title)}</h1>
         <p class="article-subtitle">{html.escape(summary)}</p>
+        <div class="post-card-footer" style="margin-top: 1.25rem;">
+          <div class="post-tags">{tags_html}</div>
+          <span class="post-card-views">觀看人次：<span id="article-view-count">—</span></span>
+        </div>
       </header>
       {hero_img_html}
       <div class="article-body" id="article-content">
@@ -401,17 +401,18 @@ def build_site():
         else ''
     )
     cards_html.append(f"""<article class="post-card" data-tags="{html.escape(','.join(p['tags']))}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
-      <div class="post-meta">
-        <time datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
-        <span>·</span>
-        <span>觀看人次：<span class="card-view-count" data-post-url="{html.escape(p['url'])}">—</span></span>
-      </div>
       <a href="posts/{p['slug']}/index.html" id="post-link-{p['slug']}">
         {cover_html}
-        <h2 class="post-card-title">{html.escape(p['title'])}</h2>
+        <div class="post-title-row">
+          <h2 class="post-card-title">{html.escape(p['title'])}</h2>
+          <time class="post-card-date" datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
+        </div>
         <p class="post-summary">{html.escape(p['summary'])}</p>
       </a>
-      <div class="post-tags">{tags_badges}</div>
+      <div class="post-card-footer">
+        <div class="post-tags">{tags_badges}</div>
+        <span class="post-card-views">觀看人次：<span class="card-view-count" data-post-url="{html.escape(p['url'])}">—</span></span>
+      </div>
     </article>""")
 
   hero_en = (
