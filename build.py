@@ -242,6 +242,7 @@ def build_site():
     title = meta.get('title', slug)
     date = meta.get('date', '')
     category = meta.get('category', '哲學思辨')
+    categories = [c.strip() for c in category.split(',') if c.strip()]
     tags = [t.strip() for t in meta.get('tags', '').split(',') if t.strip()]
     summary = meta.get('summary', '')
     image = meta.get('image', '').strip().lstrip('/')
@@ -257,6 +258,7 @@ def build_site():
         'title': title,
         'date': date,
         'category': category,
+        'categories': categories,
         'tags': tags,
         'summary': summary,
         'image': image,
@@ -278,6 +280,9 @@ def build_site():
         else ''
     )
 
+    cats_meta_html = '<span>·</span>'.join(
+        f'<span class="post-category">{html.escape(c)}</span>' for c in categories
+    )
     article_page = f"""{head_html(f"{title} | {site_cfg['title']}", summary, "../../assets/index.css", post_url, og_image_url)}
 <body>
   {header_nav(site_cfg, "../../index.html")}
@@ -285,7 +290,7 @@ def build_site():
     <article>
       <header class="article-header">
         <div class="post-meta">
-          <span class="post-category">{html.escape(category)}</span>
+          {cats_meta_html}
           <span>·</span>
           <time datetime="{html.escape(date)}">{html.escape(date)}</time>
           <span>·</span>
@@ -331,9 +336,13 @@ def build_site():
         if p.get('image')
         else ''
     )
-    cards_html.append(f"""<article class="post-card" data-category="{html.escape(p['category'])}" data-tags="{html.escape(','.join(p['tags']))}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
+    card_cats_html = '<span>·</span>'.join(
+        f'<span class="post-category">{html.escape(c)}</span>'
+        for c in p['categories']
+    )
+    cards_html.append(f"""<article class="post-card" data-category="{html.escape(','.join(p['categories']))}" data-tags="{html.escape(','.join(p['tags']))}" data-search="{html.escape((p['title'] + ' ' + p['summary'] + ' ' + ' '.join(p['tags'])).lower())}">
       <div class="post-meta">
-        <span class="post-category">{html.escape(p['category'])}</span>
+        {card_cats_html}
         <span>·</span>
         <time datetime="{html.escape(p['date'])}">{html.escape(p['date'])}</time>
       </div>
@@ -378,8 +387,9 @@ def build_site():
     function filterPosts() {{
       const q = (searchInput.value || '').trim().toLowerCase();
       cards.forEach(card => {{
+        const cats = (card.dataset.category || '').split(',');
         const tags = (card.dataset.tags || '').split(',');
-        const catMatch = activeCat === '全部' || card.dataset.category === activeCat || tags.includes(activeCat);
+        const catMatch = activeCat === '全部' || cats.includes(activeCat) || tags.includes(activeCat);
         const searchMatch = !q || card.dataset.search.includes(q);
         card.style.display = (catMatch && searchMatch) ? '' : 'none';
       }});

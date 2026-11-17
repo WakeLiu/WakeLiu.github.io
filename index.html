@@ -62,9 +62,9 @@
         <p class="post-summary">我們活著的這個時代真的太特別了。在奇點來臨的前夕，想透過與 AI 的對話與自我思辨，在這裡發表點什麼、留下些什麼。有緣，便請閱讀吧。</p>
       </a>
       <div class="post-tags"><span class="tag-badge">#楔子</span><span class="tag-badge">#奇點前夕</span><span class="tag-badge">#自我思辨</span></div>
-    </article><article class="post-card" data-category="哲學思辨" data-tags="宇宙論,模擬假說,雙狹縫實驗,因果律,奇點前夕" data-search="我們活在虛擬世界裡嗎？ 人類歷史也不過五千年，ai 就已經發展至此。如果五千年後我們有能力模擬宇宙，那麼現在的我們，會不會其實也活在虛擬世界裡？ 宇宙論 模擬假說 雙狹縫實驗 因果律 奇點前夕">
+    </article><article class="post-card" data-category="宇宙論,哲學思辨" data-tags="模擬假說,雙狹縫實驗,因果律,奇點前夕" data-search="我們活在虛擬世界裡嗎？ 人類歷史也不過五千年，ai 就已經發展至此。如果五千年後我們有能力模擬宇宙，那麼現在的我們，會不會其實也活在虛擬世界裡？ 模擬假說 雙狹縫實驗 因果律 奇點前夕">
       <div class="post-meta">
-        <span class="post-category">哲學思辨</span>
+        <span class="post-category">宇宙論</span><span>·</span><span class="post-category">哲學思辨</span>
         <span>·</span>
         <time datetime="2026-11-17">2026-11-17</time>
       </div>
@@ -73,7 +73,7 @@
         <h2 class="post-card-title">我們活在虛擬世界裡嗎？</h2>
         <p class="post-summary">人類歷史也不過五千年，AI 就已經發展至此。如果五千年後我們有能力模擬宇宙，那麼現在的我們，會不會其實也活在虛擬世界裡？</p>
       </a>
-      <div class="post-tags"><span class="tag-badge">#宇宙論</span><span class="tag-badge">#模擬假說</span><span class="tag-badge">#雙狹縫實驗</span><span class="tag-badge">#因果律</span><span class="tag-badge">#奇點前夕</span></div>
+      <div class="post-tags"><span class="tag-badge">#模擬假說</span><span class="tag-badge">#雙狹縫實驗</span><span class="tag-badge">#因果律</span><span class="tag-badge">#奇點前夕</span></div>
     </article>
   </main>
 
@@ -103,8 +103,9 @@
     function filterPosts() {
       const q = (searchInput.value || '').trim().toLowerCase();
       cards.forEach(card => {
+        const cats = (card.dataset.category || '').split(',');
         const tags = (card.dataset.tags || '').split(',');
-        const catMatch = activeCat === '全部' || card.dataset.category === activeCat || tags.includes(activeCat);
+        const catMatch = activeCat === '全部' || cats.includes(activeCat) || tags.includes(activeCat);
         const searchMatch = !q || card.dataset.search.includes(q);
         card.style.display = (catMatch && searchMatch) ? '' : 'none';
       });
